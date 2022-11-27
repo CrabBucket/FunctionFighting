@@ -19,7 +19,7 @@ fn create_camera(commands: &mut Commands){
 
 }
 
-fn setup_physics(commands: &mut Commands, world: Res<GameState>, player_entity: Entity) {
+fn setup_physics(commands: &mut Commands, world: GameState, player_entity: Entity) {
     let world_size = world.getBoard();
 
     /* Create the ground. */
@@ -37,7 +37,7 @@ fn setup_physics(commands: &mut Commands, world: Res<GameState>, player_entity: 
         .insert(TransformBundle::from(Transform::from_xyz(0.0, 4.0, 0.0)));
 }
 
-fn add_player(commands:&mut Commands, materials: &mut ResMut<Assets<StandardMaterial>>, meshes: &mut ResMut<Assets<Mesh>>) -> Entity {
+fn add_player(commands:&mut Commands, materials: &mut Assets<StandardMaterial>, meshes: &mut Assets<Mesh>) -> Entity {
     let player = PlayerBundle::test(meshes, materials);
     let input_map = [(KeyCode::W, PlayerAction::MoveUp), 
     (KeyCode::S, PlayerAction::MoveDown), 
@@ -53,7 +53,7 @@ fn add_player(commands:&mut Commands, materials: &mut ResMut<Assets<StandardMate
     return entity;
 }
 
-fn setup_scene(commands: &mut Commands, meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<StandardMaterial>>) {
+fn setup_scene(commands: &mut Commands, meshes: &mut Assets<Mesh>, materials: &mut Assets<StandardMaterial>) {
     commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
@@ -81,6 +81,6 @@ fn setup_scene(commands: &mut Commands, meshes: &mut ResMut<Assets<Mesh>>, mater
 pub fn setup(mut commands: Commands,gamestate: Res<GameState> ,materials: &mut ResMut<Assets<StandardMaterial>>, meshes: &mut ResMut<Assets<Mesh>>) {
     create_camera(&mut commands);
     let player = add_player(&mut commands, &mut materials, &mut meshes);
-    setup_physics(&mut commands, gamestate, player);
+    setup_physics(&mut commands, *gamestate, player);
     setup_scene(&mut commands, &mut meshes, &mut materials);
 }

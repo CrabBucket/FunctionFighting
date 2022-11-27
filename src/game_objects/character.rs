@@ -51,7 +51,7 @@ pub struct PlayerBundle {
     
 }
 impl PlayerBundle {
-    pub fn test(meshes: &mut ResMut<Assets<Mesh>>, materials: &mut ResMut<Assets<StandardMaterial>>) -> Self {
+    pub fn test(meshes: &mut Assets<Mesh>, materials: &mut Assets<StandardMaterial>) -> Self {
         Self {
             inventory: Inventory { items: Vec::new() },
             equipped: EquippedWeapons { weapons: Vec::new() },
