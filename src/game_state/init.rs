@@ -37,7 +37,7 @@ fn setup_physics(commands: &mut Commands, world: GameState, player_entity: Entit
         .insert(TransformBundle::from(Transform::from_xyz(0.0, 4.0, 0.0)));
 }
 
-fn add_player(commands:&mut Commands, materials: &mut Assets<StandardMaterial>, meshes: &mut Assets<Mesh>) -> Entity {
+fn add_player(commands:&mut Commands, materials: Assets<StandardMaterial>, meshes: Assets<Mesh>) -> Entity {
     let player = PlayerBundle::test(meshes, materials);
     let input_map = [(KeyCode::W, PlayerAction::MoveUp), 
     (KeyCode::S, PlayerAction::MoveDown), 
@@ -53,7 +53,7 @@ fn add_player(commands:&mut Commands, materials: &mut Assets<StandardMaterial>, 
     return entity;
 }
 
-fn setup_scene(commands: &mut Commands, meshes: &mut Assets<Mesh>, materials: &mut Assets<StandardMaterial>) {
+fn setup_scene(commands: &mut Commands, meshes: Assets<Mesh>, materials: Assets<StandardMaterial>) {
     commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
@@ -78,9 +78,9 @@ fn setup_scene(commands: &mut Commands, meshes: &mut Assets<Mesh>, materials: &m
     });
 }
 
-pub fn setup(mut commands: Commands,gamestate: Res<GameState> ,materials: &mut ResMut<Assets<StandardMaterial>>, meshes: &mut ResMut<Assets<Mesh>>) {
+pub fn setup(mut commands: Commands,gamestate: Res<GameState> ,materials: ResMut<Assets<StandardMaterial>>, meshes: ResMut<Assets<Mesh>>) {
     create_camera(&mut commands);
-    let player = add_player(&mut commands, materials, meshes);
+    let player = add_player(&mut commands, *materials, *meshes);
     setup_physics(&mut commands, *gamestate, player);
-    setup_scene(&mut commands, meshes, materials);
+    setup_scene(&mut commands, *meshes, *materials);
 }
