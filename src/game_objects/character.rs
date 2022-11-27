@@ -1,7 +1,6 @@
-
+use super::weapon::Weapon;
 use bevy::prelude::*;
 use std::sync::Arc;
-use super::weapon::Weapon;
 
 #[derive(Component)]
 struct CharacterName {
@@ -15,7 +14,6 @@ struct CurrentHealth {
 struct MaxHealth {
     health: f32,
 }
-
 
 #[derive(Bundle)]
 struct CharStats {
@@ -48,13 +46,17 @@ pub struct PlayerBundle {
     transform: TransformBundle,
     #[bundle]
     model: PbrBundle,
-    
 }
 impl PlayerBundle {
-    pub fn test(meshes: Assets<Mesh>, materials: Assets<StandardMaterial>) -> Self {
+    pub fn test(
+        meshes: &mut ResMut<Assets<Mesh>>,
+        materials: &mut ResMut<Assets<StandardMaterial>>,
+    ) -> Self {
         Self {
             inventory: Inventory { items: Vec::new() },
-            equipped: EquippedWeapons { weapons: Vec::new() },
+            equipped: EquippedWeapons {
+                weapons: Vec::new(),
+            },
             _player: Player,
             model: PbrBundle {
                 mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
@@ -63,7 +65,9 @@ impl PlayerBundle {
                 ..Default::default()
             },
             stats: CharStats {
-                name: CharacterName { name: "Player".to_string() },
+                name: CharacterName {
+                    name: "Player".to_string(),
+                },
                 current_health: CurrentHealth { health: 100.0 },
                 max_health: MaxHealth { health: 100.0 },
             },
@@ -85,5 +89,4 @@ pub struct EnemyBundle {
     stats: CharStats,
     weapons: EquippedWeapons,
     _enemy: Enemy,
-
 }

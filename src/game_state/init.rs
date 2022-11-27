@@ -2,7 +2,6 @@ use bevy::ecs::system::EntityCommands;
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-
 use crate::*;
 
 use super::GameState;
@@ -10,22 +9,28 @@ use super::GameState;
 #[derive(Component)]
 pub struct PhysicsPlugin;
 
-
-fn create_camera(commands: &mut Commands){
+fn create_camera(commands: &mut Commands) {
     commands.spawn(Camera3dBundle {
         transform: Transform::from_xyz(5.0, 5.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..default()
     });
-
 }
 
-fn setup_physics(commands: &mut Commands, world: GameState, player_entity: Entity) {
+fn setup_physics(
+    commands: &mut Commands,
+    world: Res<GameState>,
+    player_entity: Entity
+) {
     let world_size = world.getBoard();
 
     /* Create the ground. */
     commands
         .spawn(PhysicsPlugin)
-        .insert(Collider::cuboid(world_size.width as f32, 0.1, world_size.height as f32))
+        .insert(Collider::cuboid(
+            world_size.width as f32,
+            0.1,
+            world_size.height as f32,
+        ))
         .insert(TransformBundle::from(Transform::from_xyz(0.0, -2.0, 0.0)));
 
     /* Create the player ball. */
@@ -37,23 +42,34 @@ fn setup_physics(commands: &mut Commands, world: GameState, player_entity: Entit
         .insert(TransformBundle::from(Transform::from_xyz(0.0, 4.0, 0.0)));
 }
 
-fn add_player(commands:&mut Commands, materials: Assets<StandardMaterial>, meshes: Assets<Mesh>) -> Entity {
+fn add_player(
+    commands: &mut Commands,
+    materials: &mut ResMut<Assets<StandardMaterial>>,
+    meshes: &mut ResMut<Assets<Mesh>>,
+) -> Entity {
     let player = PlayerBundle::test(meshes, materials);
-    let input_map = [(KeyCode::W, PlayerAction::MoveUp), 
-    (KeyCode::S, PlayerAction::MoveDown), 
-    (KeyCode::A, PlayerAction::MoveLeft), 
-    (KeyCode::D, PlayerAction::MoveRight)];
-    let entity = commands.spawn(player)
-    .insert(InputManagerBundle::<PlayerAction>{
-        action_state: ActionState::default(),
-        input_map: InputMap::new(input_map)
-    })
-    .id();
+    let input_map = [
+        (KeyCode::W, PlayerAction::MoveUp),
+        (KeyCode::S, PlayerAction::MoveDown),
+        (KeyCode::A, PlayerAction::MoveLeft),
+        (KeyCode::D, PlayerAction::MoveRight),
+    ];
+    let entity = commands
+        .spawn(player)
+        .insert(InputManagerBundle::<PlayerAction> {
+            action_state: ActionState::default(),
+            input_map: InputMap::new(input_map),
+        })
+        .id();
 
     return entity;
 }
 
-fn setup_scene(commands: &mut Commands, meshes: Assets<Mesh>, materials: Assets<StandardMaterial>) {
+fn setup_scene(
+    commands:&mut Commands,
+    meshes:&mut ResMut<Assets<Mesh>>,
+    materials:&mut ResMut<Assets<StandardMaterial>>,
+) {
     commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
         material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
@@ -78,9 +94,14 @@ fn setup_scene(commands: &mut Commands, meshes: Assets<Mesh>, materials: Assets<
     });
 }
 
-pub fn setup(mut commands: Commands,gamestate: Res<GameState> ,materials: ResMut<Assets<StandardMaterial>>, meshes: ResMut<Assets<Mesh>>) {
+pub fn setup(
+    mut commands: Commands,
+    gamestate: Res<GameState>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+) {
     create_camera(&mut commands);
-    let player = add_player(&mut commands, *materials, *meshes);
-    setup_physics(&mut commands, *gamestate, player);
-    setup_scene(&mut commands, *meshes, *materials);
+    let player = add_player(&mut commands, &mut materials, &mut meshes);
+    setup_physics(&mut commands, gamestate, player);
+    setup_scene(&mut commands, &mut meshes, &mut materials);
 }
