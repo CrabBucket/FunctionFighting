@@ -80,7 +80,7 @@ fn setup_scene(commands: &mut Commands, meshes: &mut Assets<Mesh>, materials: &m
 
 pub fn setup(mut commands: Commands,gamestate: Res<GameState> ,materials: &mut ResMut<Assets<StandardMaterial>>, meshes: &mut ResMut<Assets<Mesh>>) {
     create_camera(&mut commands);
-    let player = add_player(&mut commands, &mut materials, &mut meshes);
+    let player = add_player(&mut commands, materials, meshes);
     setup_physics(&mut commands, *gamestate, player);
-    setup_scene(&mut commands, &mut meshes, &mut materials);
+    setup_scene(&mut commands, meshes, materials);
 }
